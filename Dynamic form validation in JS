@@ -1,0 +1,58 @@
+class FormValidator {
+    constructor(form) {
+        this.form = form;
+        this.fields = form.querySelectorAll('input');
+    }
+
+    validate() {
+        let isValid = true;
+        this.fields.forEach(field => {
+            const validation = field.dataset.validation;
+            const value = field.value;
+
+            if (validation === 'required' && !value) {
+                isValid = false;
+                this.showError(field, 'This field is required');
+            } else if (validation === 'email' && !this.validateEmail(value)) {
+                isValid = false;
+                this.showError(field, 'Invalid email format');
+            } else if (validation === 'password' && value.length < 6) {
+                isValid = false;
+                this.showError(field, 'Password must be at least 6 characters');
+            } else {
+                this.showSuccess(field);
+            }
+        });
+        return isValid;
+    }
+
+    showError(field, message) {
+        const error = field.nextElementSibling;
+        error.textContent = message;
+        error.style.display = 'block';
+        field.style.borderColor = 'red';
+    }
+
+    showSuccess(field) {
+        const error = field.nextElementSibling;
+        error.textContent = '';
+        error.style.display = 'none';
+        field.style.borderColor = 'green';
+    }
+
+    validateEmail(email) {
+        const re = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+        return re.test(email);
+    }
+}
+
+// Usage:
+document.querySelector('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const validator = new FormValidator(this);
+    if (validator.validate()) {
+        console.log('Form submitted successfully');
+    } else {
+        console.log('Form has errors');
+    }
+});
